@@ -7,16 +7,25 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 1
+WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 CHECKMARK = "✔"
 reps = 0
+timer = None
 
 
 # ---------------------------- TIMER RESET ------------------------------- #
+def reset_timer():
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text="00:00")
+    lbl_tracker.config(text="")
+    lbl_timer.config(text="Timer")
+    global reps
+    reps = 0
 
-# ---------------------------- TIMER MECHANISM ------------------------------- # 
+
+# ---------------------------- TIMER MECHANISM ------------------------------- #
 
 def start_timer():
     global reps
@@ -39,7 +48,6 @@ def start_timer():
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
 def count_down(count):
-
     count_min = math.floor(count / 60)
     count_sec = count % 60
     if count_sec < 10:
@@ -47,13 +55,14 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
     # catches when count goes to 0
     else:
         start_timer()
         marks = ""
         work_sessions = math.floor(reps / 2)
-        for _ in range(math.floor(reps / 2)):
+        for _ in range(work_sessions):
             marks += "✔"
         lbl_tracker.config(text=marks)
 
@@ -79,7 +88,7 @@ btn_start = Button(text="Start", highlightthickness=0, command=start_timer)
 btn_start.grid(row=2, column=0)
 
 # Button - Reset
-btn_reset = Button(text="Reset", highlightthickness=0)
+btn_reset = Button(text="Reset", highlightthickness=0, command=reset_timer)
 btn_reset.grid(row=2, column=2)
 
 # Label - Task
